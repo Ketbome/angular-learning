@@ -1,4 +1,5 @@
-@let data = product();
+@let data = $product();
+@let cover = $cover();
 
 @if (data) {
   <div class="w-full flex flex-col md:flex-row md:space-x-10">
@@ -9,7 +10,7 @@
             alt="ecommerce"
             [fill]="true"
             class="w-full object-cover object-center"
-            [ngSrc]="cover()"
+            [ngSrc]="cover"
           />
         </div>
       </div>
@@ -26,7 +27,7 @@
               class="object-cover object-center rounded border-2 border-gray-200"
               [src]="img"
               (click)="changeCover(img)"
-              [class.border-red-400]="img === cover()"
+              [class.border-red-400]="img === cover"
             />
           }
         </div>
