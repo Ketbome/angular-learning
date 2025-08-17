@@ -19,8 +19,11 @@ import { CartService } from '@shared/services/cart.service';
 export default class ProductDetailComponent implements OnInit {
   readonly id = input<string>();
   $product = signal<Product | null>(null);
-  $cover = linkedSignal(() => {
-    return this.$product()?.images[0] ?? '';
+  $cover = linkedSignal({
+    source: this.$product,
+    computation: (product, previousValue) => {
+      return product?.images[0] ?? previousValue;
+    },
   });
   private productService = inject(ProductService);
   private cartService = inject(CartService);
