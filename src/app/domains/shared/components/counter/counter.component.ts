@@ -73,7 +73,9 @@ export class CounterComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     console.log('ngOnDestroy');
     console.log('-'.repeat(10));
-    window.clearInterval(this.counterRef);
+    if (typeof window !== 'undefined' && this.counterRef !== undefined) {
+      window.clearInterval(this.counterRef);
+    }
   }
 
   doSomething() {
