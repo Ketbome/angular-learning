@@ -24,6 +24,7 @@ module.exports = tseslint.config(
           style: "camelCase",
         },
       ],
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
       "@angular-eslint/component-selector": [
         "error",
         {
