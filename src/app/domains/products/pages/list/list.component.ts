@@ -23,14 +23,14 @@ export default class ListComponent {
   $products = signal<Product[]>([]);
 
   categoriesResource = rxResource({
-    loader: () => this.categoryService.getAll(),
+    stream: () => this.categoryService.getAll(),
   });
 
   productResource = rxResource({
-    request: () => ({
+    params: () => ({
       category_slug: this.slug(),
     }),
-    loader: ({ request }) => this.productService.getProducts(request),
+    stream: ({ params }) => this.productService.getProducts(params),
   });
 
   addToCart(product: Product) {
