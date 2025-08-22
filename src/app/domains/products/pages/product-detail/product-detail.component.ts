@@ -1,42 +1,65 @@
-import {
-  Component,
-  inject,
-  signal,
-  OnInit,
-  input,
-  linkedSignal,
-} from '@angular/core';
+import { Component, inject, input, linkedSignal, effect } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ProductService } from '@shared/services/product.service';
-import { Product } from '@shared/models/product.model';
 import { CartService } from '@shared/services/cart.service';
+import { Meta, Title } from '@angular/platform-browser';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-product-detail',
   imports: [CommonModule, NgOptimizedImage],
   templateUrl: './product-detail.component.html',
 })
-export default class ProductDetailComponent implements OnInit {
-  readonly id = input<string>();
-  $product = signal<Product | null>(null);
+export default class ProductDetailComponent {
+  readonly slug = input.required<string>();
+  productRs = rxResource({
+    params: () => ({
+      slug: this.slug(),
+    }),
+    stream: ({ params }) => {
+      return this.productService.getOneBySlug(params.slug);
+    },
+  });
   $cover = linkedSignal({
-    source: this.$product,
+    source: this.productRs.value,
     computation: (product, previousValue) => {
       return product?.images[0] ?? previousValue;
     },
   });
-  private productService = inject(ProductService);
-  private cartService = inject(CartService);
+  private readonly productService = inject(ProductService);
+  private readonly cartService = inject(CartService);
 
-  ngOnInit() {
-    const id = this.id();
-    if (id) {
-      this.productService.getOne(id).subscribe({
-        next: (product) => {
-          this.$product.set(product);
-        },
-      });
-    }
+  titleService = inject(Title);
+  metaService = inject(Meta);
+
+  constructor() {
+    effect(() => {
+      const product = this.productRs.value();
+      if (product) {
+        this.titleService.setTitle(product.title);
+        this.metaService.updateTag({
+          name: 'description',
+          content: product.description,
+        });
+        this.metaService.updateTag({
+          name: 'og:title',
+          content: product.title,
+        });
+        this.metaService.updateTag({
+          name: 'og:image',
+          content: product.images[0],
+        });
+        this.metaService.updateTag({
+          name: 'og:description',
+          content: product.description,
+        });
+        this.metaService.updateTag({
+          name: 'og:url',
+          content: `${environment.domain}/product/${this.slug()}`,
+        });
+      }
+    });
   }
 
   changeCover(newImg: string) {
@@ -44,7 +67,7 @@ export default class ProductDetailComponent implements OnInit {
   }
 
   addToCart() {
-    const product = this.$product();
+    const product = this.productRs.value();
     if (product) {
       this.cartService.addToCart(product);
     }

@@ -25,4 +25,10 @@ export class ProductService {
       `${environment.apiUrl}/api/v1/products/${id}`,
     );
   }
+
+  getOneBySlug(slug: string) {
+    return this.http.get<Product>(
+      `${environment.apiUrl}/api/v1/products/slug/${slug}`,
+    );
+  }
 }
