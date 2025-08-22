@@ -21,6 +21,6 @@ export const appConfig: ApplicationConfig = {
       withPreloading(PreloadAllModules),
     ),
     provideHttpClient(),
-    provideClientHydration(withEventReplay()),
+    provideClientHydration(withEventReplay()), //importante
   ],
 };
